@@ -18,6 +18,14 @@
     cd Blog-Express-pg-sequelize
     
     npm install
+
+    สร้างไฟล์ .env 
+    TOKEN=jwttoken
+    DB=sequelizeCRUD
+    USER=postgres
+    PASSWORD=postgres
+    HOST=localhost
+    DB_dialect=postgres
     
 ##  วิธีการใช้งาน
 
