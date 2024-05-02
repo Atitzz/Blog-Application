@@ -18,6 +18,14 @@
     cd Blog-Express-pg-sequelize
     
     npm install
+
+    สร้างไฟล์ .env (เพื่อระบุตัวแปร Database & token)
+    TOKEN=???
+    DB=???
+    USER=???
+    PASSWORD=???
+    HOST=???
+    DB_dialect=???
     
 ##  วิธีการใช้งาน
 
