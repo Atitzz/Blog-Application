@@ -399,7 +399,9 @@ const follow = async (req, res) => {
       await db.User.decrement({ follower: 1 }, { where: { id: authorId } });
     }
 
-    res.redirect("/author");
+    const returnTo = req.session.returnTo || '/'
+    delete req.session.returnTo
+    res.redirect(returnTo);
   } catch (error) {
     console.log(error);
   }

@@ -472,6 +472,8 @@ const author = async (req, res) => {
       },
     });
 
+    req.session.returnTo = req.originalUrl;
+    
     res.render("author", {
       authors: author,
       user,
