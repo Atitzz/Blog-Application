@@ -19,13 +19,13 @@
     
     npm install
 
-    สร้างไฟล์ .env 
-    TOKEN=jwttoken
-    DB=sequelizeCRUD
-    USER=postgres
-    PASSWORD=postgres
-    HOST=localhost
-    DB_dialect=postgres
+    สร้างไฟล์ .env (เพื่อระบุตัวแปร Database & token)
+    TOKEN=???
+    DB=???
+    USER=???
+    PASSWORD=???
+    HOST=???
+    DB_dialect=???
     
 ##  วิธีการใช้งาน
 
