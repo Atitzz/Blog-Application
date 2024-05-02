@@ -1,0 +1,413 @@
+<style>
+
+    section {
+        background-color: #363b41;
+    }
+
+    .card-img {
+        width: 100%; 
+        height: 500; 
+    }
+
+    .comment-form {
+        margin-bottom: 20px;
+    }
+
+    .comment-form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .comment-form button {
+        background-color: #3498db;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .comment-form button:hover {
+        background-color: #0066aa;
+    }
+
+    .comments-section {
+        margin-top: 30px;
+    }
+
+    .comment {   
+        position: relative;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+    }
+
+    .comment-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center; 
+        margin-bottom: 10px;
+    }
+
+    .comment-author {
+        font-weight: bold;
+        color: #000000;
+    }
+
+    .comment-date {
+        color: #7f7f7f;
+    }
+
+    .comment-content {
+        margin: 0;
+        line-height: 1.6;
+        color: #333;
+        font-size: 16px;
+        font-weight: 400;
+        margin-bottom: 10px;
+        color: #000000;
+    }
+
+    .reply-btn-container {
+        display: flex;
+        justify-content: flex-end; 
+    }
+
+    .reply-btn {
+        color: #888;
+        text-decoration: none;
+        cursor: pointer;
+        margin-left: 10px; 
+    }
+
+    .reply-form {
+        width: 100%;
+        margin-top: 0px;
+        padding-left: 20px;
+        display: none; /* ซ่อน Reply Form เริ่มต้น */
+    }
+
+    .reply-form textarea {
+        width: calc(100% - 20px); /* ลดขนาดของ textarea ให้เหลือพื้นที่สำหรับ padding */
+        padding: 15px;
+        margin-bottom: 5px;
+        border: 1px solid #3498db;
+        border-radius: 5px;
+        resize: vertical;
+    }
+
+    .reply-form button {
+        background-color: #3498db;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .reply-form button:hover {
+        background-color: #0066aa;
+    }
+
+    .reply-comment {
+        margin-top: 5px;
+        margin-bottom: 10px;
+    }
+
+    .reply-div {
+        margin: 0px 15px 0px 15px;
+        padding: 10px 15px 0px 15px;
+        border: 2px solid rgba(173, 173, 173, 0.3); 
+        border-radius: 10px;
+        background: rgba(115, 115, 115, 0.1); 
+        transition: height 0.3s ease;
+    }
+
+    .reply-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .reply-author {
+        font-weight: bold;
+        margin-right: 10px;
+        color: #000000;
+    }
+
+    .reply-date {
+        color: #777;
+    }
+
+    .reply-content {
+        margin: 5px 0px 0px 40px;
+        background-color: #fff;
+    }
+
+    #title_view {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 5px;
+    }
+
+    .edit-link {
+        float: right;
+        margin-top: 0rem; /* Adjust as needed */
+        font-size: 1.5rem; /* Adjust the font size as needed */
+    }
+
+    #btn-follow {
+        margin-top: 5px;
+        padding-left: 30px;
+        padding-right: 30px;
+        font-weight: bold;
+    }
+
+    #author-image {
+        width: 30px;
+        height: 30px;
+        border: 2px solid #ff8c00;
+        border-radius: 50%;
+    }
+
+    #author-reply {
+        width: 30px;
+        height: 30px;
+        border: 2px solid #ff8c00;
+        border-radius: 50%;
+    }
+
+    .like-btn, .dislike-btn {
+        width: 100%; 
+        height: 40px;
+        margin-right: 1%;
+        margin-bottom: 10px; 
+        text-align: center; 
+        white-space: nowrap; 
+    }
+
+    .liked {
+        background-color: green; /* เปลี่ยนสีพื้นหลังเป็นสีเขียวเมื่อมีการกด Like */
+    }
+
+    .disliked {
+        background-color: red; /* เปลี่ยนสีพื้นหลังเป็นสีแดงเมื่อมีการกด Dislike */
+    }
+
+    .btn-goBack {
+        border: none; 
+        background-color: #fff;
+        color: #888;
+        font-size: 16px;
+        margin: 5px 0px 0px 0px;
+    }
+    .btn-goBack:hover {
+        color: #ff8c00;
+        cursor: pointer;
+    }
+
+</style>
+
+<section>
+    <%- include('navbar') %>
+</section>
+
+        <div class="container">
+            <% if(message.length > 0) { %>
+                <div class="alert alert-success text-center my-2" role="alert" id="custom-alert">
+                    <%= message %>
+                </div>
+            <% } %>    
+
+            <div class="row">
+                <div class="col-lg-8">
+
+                <!-- ปุ่มย้อนกลับ -->
+                <button onclick="goBack()" class="btn-goBack">
+                    <i class="fa-solid fa-circle-chevron-left"> ย้อนกลับ</i>
+                </button>
+                    
+                <!-- แสดง Blog -->
+                <% posts.forEach(function(post) { %>
+                    <h1 class="" id="title_view"><%= post.title %>
+                    <span style="font-size: 14px; color:#777"><%= post.views %> views</span>
+                    </h1>
+
+                    <div class="lead">
+                        by
+                        <a href="/posts/show/?author=<%= post.author %>"><%= post.author %></a>
+
+                        <% if((userNormal && userNormal.username == post.author ) || (googleUser && googleUser.username == post.author)) { %>
+                            <a href="/edit/<%= post.id %>" class="btn btn-outline-warning edit-link">
+                                Edit <i class="fas fa-edit"></i>
+                            </a>
+                        <% } %>
+
+                        <!-- ปุ่ม Follow -->
+                        <% const authorFollowStatus = existingFollower.find(follow => follow.authorId === post.authorId); %>
+                        <% if ((userNormal && post.authorId !== userNormal.id) || (googleUser && post.authorId !== googleUser.id)) { %>
+                        <form action="/users/follow/<%= post.authorId %>" method="post">
+                            <% if(authorFollowStatus && authorFollowStatus.status === 'follower') { %>
+                                <button type="submit" class="btn btn-primary" id="btn-follow">Unfollow</button>
+                            <% } else { %>
+                                <button type="submit" class="btn btn-outline-primary" id="btn-follow">Follow</button>
+                            <% } %>
+                        </form>
+                        <% } %>
+                    </div>
+                    <hr>
+                    <p>Posted on <%= day(post.date).format("DD-MM-YYYY") %></p>
+                    <hr>
+                    <img class="card-img" src="/images/<%= post.img %>" alt="" width="900px" height="300px">
+                    <hr>
+                    <%- post.content %>
+                    <hr>
+                    
+                    <!-- เพิ่มปุ่มกด like และ dislike -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form action="/like/<%= post.id %>" method="POST">
+                                <% if(userReactions != null && userReactions.reaction == 'like') { %>
+                                <button type="submit" class="btn btn-success like-btn">
+                                    <i class="fas fa-thumbs-up mr-2"></i>
+                                <% if (post.likes > 0) { %>
+                                    <%= post.likes %> Like
+                                <% } %>
+                                </button>
+                                <% } else { %>
+                                <button type="submit" class="btn btn-outline-success like-btn">
+                                    <i class="fas fa-thumbs-up mr-2"></i>
+                                <% if (post.likes > 0) { %>
+                                    <%= post.likes %> Like
+                                <% } %>
+                                </button>    
+                                <% } %>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form action="/dislike/<%= post.id %>" method="POST">
+                                <% if(userReactions != null && userReactions.reaction == 'dislike') { %>
+                                <button type="submit" class="btn btn-danger dislike-btn">
+                                    <i class="fas fa-thumbs-down mr-2"></i>
+                                <% if (post.dislikes > 0) { %>
+                                    <%= post.dislikes %> Dislike
+                                <% } %>
+                                </button>
+                                <% } else { %>
+                                <button type="submit" class="btn btn-outline-danger dislike-btn">
+                                    <i class="fas fa-thumbs-down mr-2"></i>
+                                <% if (post.dislikes > 0) { %>
+                                    <%= post.dislikes %> Dislike
+                                <% } %>
+                                </button>
+                                <% } %>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Comment Form -->
+                    <form action="/show/<%= post.id %>" method="post" class="comment-form">
+                        <textarea name="comment" id="comment" rows="4" placeholder="แสดงความคิดเห็น..." required></textarea>
+                        <button type="submit">Submit Comment</button>
+                    </form>
+
+                    <!-- แสดง Comment -->
+                    <% if(Comments) { %>
+                        <div class="comments-section">
+                            <% Comments.forEach((comment) => { %>
+                                <div class="comment">
+                                    <div class="comment-meta">
+                                        <span class="comment-author">
+                                            <% if(comment.User.profileImage.startsWith('http')) { %>
+                                            <img src="<%= comment.User.profileImage %>" id="author-image"> 
+                                            <% } else { %>
+                                            <img src="/profile/<%= comment.User.profileImage %>" id="author-image"> 
+                                            <% } %>
+                                            : <u><%= comment.username %></u>
+                                        </span>
+                                        <span class="comment-date"><%= day(comment.createdAt).format("DD/MM/YYYY HH:mm:ss") %></span>
+                                    </div>
+                                    <hr>
+                                    <p class="comment-content mb-1"><%= comment.content %></p>
+                             
+                                    <div class="reply-btn-container ">
+                                        <button class="btn btn-link reply-btn" data-comment-id="<%= comment.id %>"><i class="fas fa-reply"></i>  Reply</button>
+                                    </div>
+                                </div>
+
+                                <!-- Reply Section -->
+                                <% if(comment.Replies && comment.Replies.length > 0) { %>
+                                    <div id="reply-text-<%= comment.id %>" class="reply-section">
+                                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-<%= comment.id %>" aria-expanded="false" aria-controls="collapse-<%= comment.id %>">
+                                            แสดงข้อความตอบกลับ
+                                        </button>
+                                        <div class="collapse reply-div" id="collapse-<%= comment.id %>">
+                                            <% comment.Replies.forEach((reply) => { %>
+                                                <div class="reply-blog mb-3">
+                                                    <div class="reply-meta">
+                                                        <span class="reply-author"><img src="/profile/<%= reply.User.profileImage %>" id="author-reply"> : <u><%= reply.username %></u></span>
+                                                        <span class="reply-date"><%= day(reply.createdAt).format("DD/MM/YYYY HH:mm:ss") %></span>
+                                                    </div>
+                                                    <p class="reply-content"><%= reply.content %></p>
+                                                </div>
+                                            <% }) %>
+                                        </div>
+                                    </div>
+                                <% } %>
+                                
+                                <!-- Reply Form -->                                       
+                                <div class="reply-comment">
+                                    <form action="/show/<%= post.id %>/<%= comment.id %>" method="post" class="reply-form" id="reply-form-<%= comment.id %>" >
+                                        <textarea name="reply" rows="1" placeholder="ตอบกลับความคิดเห็น..." required></textarea>
+                                        <button type="submit">Submit Reply</button>
+                                    </form>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                <% }) %>
+                </div>
+                <%- include('sidebar') %>
+            </div>
+        </div>
+
+<%- include('footer') %>
+
+<!-- Comment -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const replyButtons = document.querySelectorAll('.reply-btn');
+
+        replyButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const commentId = this.getAttribute('data-comment-id');
+                const replyForm = document.getElementById(`reply-form-${commentId}`);
+                const replyText = document.getElementById(`reply-text-${commentId}`);
+
+                // ซ่อน/แสดง Reply Form
+                replyForm.style.display = (replyForm.style.display === 'none' || replyForm.style.display === '') ? 'block' : 'none';
+            });
+        });
+    });
+</script>
+
+<!-- Alert -->
+<script>
+    setTimeout(() => {
+        document.getElementById('custom-alert').style.display = 'none';
+    }, 4000);
+</script>
+
+<!-- ปุ่มย้อนกลับ -->
+<script>
+    function goBack() {
+      window.history.back();
+    }
+</script>

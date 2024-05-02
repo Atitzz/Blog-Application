@@ -1,0 +1,226 @@
+<style>
+
+    section {
+        background-color: #363b41;
+    }
+
+    .custom-btn {
+        color: #3c3b3b !important;
+        font-weight: bold !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease-in-out !important;
+        background-color: #ffc107 !important;
+    }
+
+    .custom-btn:hover {
+        background-color: #ff8c00 !important;
+    }
+
+    .custom {
+        background-color: #f8f9fa;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        border-radius: 15px !important;
+        overflow: hidden;
+        transition: transform 0.2s;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        margin-bottom: 20px;
+        height: 100%;
+    }
+
+    .card-img-top {
+        border-radius: 15px 15px 0 0;
+        height: 200px;
+        object-fit: cover;
+        position: relative;
+    }
+
+    .card-body.custom {
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .card-title {
+        flex: 1;
+        display: flex;
+        align-items: center;
+    }
+
+    .card-title a {
+        width: 100%;
+        display: inline-block;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    ul {
+        color: #fed41a;
+        padding-left: 0px;
+        margin-bottom: 0px;
+    }
+
+    .edit-link {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1rem;
+        color: #fed41a;
+        text-decoration: none;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .edit-link:hover {
+        color: #ff8c00;
+    }
+
+    #btn-follow {
+        font-weight: bold;
+    }
+
+    .btn-goBack {
+        border: none;
+        background-color: #fff;
+        color: #888;
+        font-size: 16px;
+        margin: -19px 0px -30px 0px;
+    }
+
+    .btn-goBack:hover {
+        color: #ff8c00;
+        cursor: pointer;
+    }
+</style>
+
+<section id="navbar">
+    <%- include('navbar') %>
+</section>
+
+<div class="container my-4">
+    <!-- ปุ่มย้อนกลับ -->
+    <button onclick="goBack()" class="btn-goBack">
+        <i class="fa-solid fa-circle-chevron-left"> ย้อนกลับ</i>
+    </button>
+
+    <div class="row justify-content-end">
+        <h2 class="text-center" style="margin-right: 25%;">AUTHOR
+            <hr style="border-bottom: 2px solid #fed41a; margin: 2px auto; width: 100%;" />
+        </h2>
+        <form class="custom-form form-group" action="/author/" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="ค้นหาผู้เขียน ..." name="search">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-secondary margin-right-10">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="row">
+        <% const showAuthor=authors.filter((data)=> data.id != null) %>
+            <% if(showAuthor.length> 0) { %>
+                <% authors.forEach(author=> { %>
+                    <div class="col-lg-3 col-md-4 col-sm-6 my-2">
+                        <div class="card">
+                            <% if(author.profileImage.startsWith('http')) { %>
+                                <img class="card-img-top" src="<%= author.profileImage %>" alt="Card image cap">
+                                <% } else { %>
+                                    <img class="card-img-top" src="/profile/<%= author.profileImage %>"
+                                        alt="Card image cap">
+                                    <% } %>
+                                        <div class="card-body custom">
+                                            <a href="/users/edit-profile/<%= author.id %>" class="edit-link">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            <!-- แสดงจำนวนผู้ติดตาม -->
+                                            <% if(author.follower> 0) { %>
+                                                <p
+                                                    style="font-size: 12px; margin-top: -20px; margin-bottom: 0px; color:#959494">
+                                                    <%= author.follower %> Follower
+                                                </p>
+                                                <% } %>
+
+                                                    <!-- ปุ่ม Follow -->
+                                                    <% const authorFollowStatus=existingFollower.find(follow => follow.authorId === author.id); %>
+                                                        <% if ((userNormal && author.id !==userNormal.id) || (googleUser && author.id !==googleUser.id)) { %>
+                                                            <form action="/users/follow/<%= author.id %>" method="post">
+                                                                <% if(authorFollowStatus &&
+                                                                    authorFollowStatus.status==='follower' ) { %>
+                                                                    <button type="submit" class="btn btn-primary"
+                                                                        id="btn-follow">Unfollow</button>
+                                                                    <% } else { %>
+                                                                        <button type="submit"
+                                                                            class="btn btn-outline-primary"
+                                                                            id="btn-follow">Follow</button>
+                                                                        <% } %>
+                                                            </form>
+                                                            <% } %>
+
+                                                                <h1 class="card-title text-center">
+                                                                    <a
+                                                                        href="/posts/show/?author=<%= author.username %>">
+                                                                        <%= author.username %>
+                                                                    </a>
+
+                                                                </h1>
+                                                                <button class="btn btn-warning custom-btn" type="button"
+                                                                    data-toggle="collapse"
+                                                                    data-target="#collapseExample<%= author.id %>">
+                                                                    ผลงานทั้งหมด
+                                                                </button>
+                                                                <div class="collapse"
+                                                                    id="collapseExample<%= author.id %>">
+                                                                    <div class="card-body">
+                                                                        <ul>
+                                                                            <% author.blogs.forEach(data=> { %>
+                                                                                <li>
+                                                                                    <a href="/show/<%= data.id %>">
+                                                                                        <%= data.title %>
+                                                                                    </a>
+                                                                                </li>
+                                                                                <% }) %>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                        </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                        <% } %>
+    </div>
+
+    <% if (showAuthor.length===0) { %>
+        <div class="alert alert-warning text-center" role="alert">
+            ไม่พบชื่อผู้เขียน
+            <br>
+        </div>
+        <div class="text-center">
+            <a href="/author">ย้อนกลับ</a>
+        </div>
+        <script>
+            setTimeout(function () {
+                window.location.href = "/author";
+            }, 4000); 
+        </script>
+        <% } %>
+
+</div>
+
+<%- include('footer') %>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>

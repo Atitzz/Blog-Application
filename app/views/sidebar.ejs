@@ -1,0 +1,205 @@
+<style>
+.card.my-4 .card-header {
+  background-color: #fed41a; 
+  color: #404040; 
+}
+
+.card.my-4 .input-group-btn .btn-secondary {
+  background-color: #404040; 
+  color: #ffffff; 
+}
+
+.card.my-4 .card-header, .card.my-4 .card-body {
+  color: #404040; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.card.my-4 .list-unstyled li {
+  padding: 10px 0; 
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card.my-4 .list-unstyled a {
+  color: #404040; 
+  transition: color 0.3s ease; 
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.card.my-4 .list-unstyled a:hover {
+  color: #666666;
+}
+
+.card.my-4 .card-body {
+  background-color: #f4f4f4; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.card.my-4 .card-header, .card.my-4 .card-body {
+  border-color: #fed41a; 
+}
+
+.card.my-4 .card-body {
+  background-color: #f8f9fa; 
+}
+
+.badge-primary {
+  background-color: #fed41a; 
+  color: #404040; 
+  font-size: 0.8rem; 
+  padding: 5px 10px; 
+  margin-left: 5px;
+  border-radius: 10%;
+}
+
+.popular-blog {
+  position: relative;
+  display: block;
+}
+
+.popular-blog-img {
+  width: 100%;
+  height: 150px;
+}
+
+.popular-blog-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s ease;
+}
+
+.popular-blog:hover .popular-blog-overlay {
+  opacity: 1;
+}
+
+.custom-li a {
+  text-decoration: none;
+}
+
+.custom-li:hover {
+  border: 2 solid #888;
+  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.3); 
+  border: 1px solid rgb(0, 0, 0, 0.1); 
+}
+
+</style>
+
+<div class="col-md-4">
+  <div>
+    <!-- Search Widget -->
+    <div class="card my-4">
+      <h5 class="card-header">Search</h5>
+      <div class="card-body">
+        <form class="form-group" action="/posts/show/" method="get">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="fas fa-search fa-lg"></i>
+              </span>
+            </div>
+            <input type="text" class="form-control" placeholder="Search for..." name="search" required>
+          </div>
+            <input type="submit" name="" value="Go" class="btn btn-secondary form-control mt-1">
+        </form>
+      </div>
+    </div>
+  
+    <!-- Categories Widget -->
+    <div class="card my-4">
+      <h5 class="card-header text-center">หมวดหมู่</h5>
+      <div class="card-body">
+        <ul class="list-group list-unstyled mb-0">
+          <% categoryCounts.sort((a, b) => b.count - a.count) %>
+          <% categoryCounts.slice(0, 5).forEach((category) => { %>
+            <li class="custom-li">
+              <a href="/posts/show/?category=<%= category.name %>" class="d-flex justify-content-between align-items-center">
+                <span><%= category.name %></span> 
+                <span class="badge badge-primary"><%= category.count %></span> 
+              </a>
+            </li>
+          <% }) %>
+        </ul>
+        <div class="collapse" id="collapseCategory">
+          <ul class="list-group list-unstyled mb-0">
+            <% categoryCounts.slice(5).forEach((category) => { %>
+              <li class="custom-li">
+                <a href="/posts/show/?category=<%= category.name %>" class="d-flex justify-content-between align-items-center">
+                  <span><%= category.name %></span> 
+                  <span class="badge badge-primary"><%= category.count %></span> 
+                </a>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+        <% if (categoryCounts.length > 5) { %>
+          <div class="d-flex justify-content-center mt-2">
+            <button class="btn btn-link text-primary" type="button" data-toggle="collapse" data-target="#collapseCategory" aria-expanded="false" aria-controls="collapseCategory" id="toggleCollapseBtn">Show more</button>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    
+
+    <!-- Popular -->
+    <% if(topLikedBlogs.length > 0) { %>
+      <div class="card my-4">
+        <div class="card-header text-center" id="title-topLike">ยอดไลค์สูงสุด</div>
+        <div class="card-body">
+          <% topLikedBlogs.forEach((blog) => { %>
+            <a href="/show/<%= blog.id %>" class="popular-blog mb-2">
+              <img src="/images/<%= blog.img %>" alt="<%= blog.title %>" class="popular-blog-img">
+              <div class="popular-blog-overlay">
+                <%= blog.title %>
+                <span><%= blog.likes %> Likes</span>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="card my-4">
+        <div class="card-header text-center" id="title-topView">ยอดเข้าชมสูงสุด</div>
+        <div class="card-body">
+          <% topViewsBlogs.forEach((blog) => { %>
+            <a href="/show/<%= blog.id %>" class="popular-blog mb-2">
+              <img src="/images/<%= blog.img %>" alt="<%= blog.title %>" class="popular-blog-img">
+              <div class="popular-blog-overlay">
+                <%= blog.title %>
+                <span><%= blog.views %> Views</span>
+              </div>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+    
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleCollapseBtn = document.getElementById('toggleCollapseBtn');
+    const collapseCategory = document.getElementById('collapseCategory');
+  
+    toggleCollapseBtn.addEventListener('click', function () {
+      if (collapseCategory.classList.contains('show')) {
+        toggleCollapseBtn.textContent = 'Show more';
+      } else {
+        toggleCollapseBtn.textContent = 'Show less';
+      }
+    });
+  });
+  </script>
