@@ -4,29 +4,19 @@ const { Op, Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
 
+const { getUserInfo, getUserNormal } = require("./function/getUser");
+const { getCategories, getCategoryCounts } = require("./function/getCategory");
+
 // index (show post & set page)
 const index = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     const message = req.flash("success");
 
-    // แสดง category ทั้งหมดที่มี
-    const categories = await db.Category.findAll({});
-    // นับจำนวน category (จาก Blog ที่สร้าง)
-    const categoryCounts = await Promise.all(
-      categories.map(async (category) => {
-        const count = await db.Blog.count({
-          where: { categoryId: category.id },
-        });
-        return { name: category.name, count: count };
-      })
-    );
+    const categories = await getCategories();
+    const categoryCounts = await getCategoryCounts(categories);
 
     // กำหนดเพื่อทำ pagination //
     const page = parseInt(req.query.page) || 1;
@@ -101,15 +91,11 @@ const index = async (req, res) => {
 // แบบฟอร์มบันทึกหมวดหมู่
 const formCategory = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     const message = req.flash("error");
-    const category = await db.Category.findAll({});
+    const category = await getCategories(["name"], [["name"]]);
     res.render("addCategory", {
       categories: category,
       message,
@@ -129,7 +115,6 @@ const createCategory = async (req, res) => {
     const { name } = req.body;
     const existingCategory = await db.Category.findOne({
       where: { name: name },
-      // indexHints: ["categoryName_index"],
     });
 
     if (req.user.role === "admin") {
@@ -152,19 +137,13 @@ const createCategory = async (req, res) => {
 // แบบฟอร์มบันทึกโพสต์
 const formAddPost = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     const userId = req.user.id;
     const username = req.user.username;
-    const category = await db.Category.findAll({
-      attributes: ["name", "id"],
-      order: [["name"]],
-    });
+    const category = await getCategories(["name", "id"], [["name"]]);
+
     res.render("addPost", {
       categories: category,
       user,
@@ -210,18 +189,13 @@ const createPost = async (req, res) => {
 // แบบฟอร์มแก้ไขโพสต์
 const formEdit = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     const postId = req.params.id;
     const blog = await db.Blog.findByPk(postId);
-    const category = await db.Category.findAll({
-      attributes: ["name"],
-    });
+
+    const category = await getCategories(["name"], [["name"]]);
 
     const message = req.flash("error");
 
@@ -251,7 +225,7 @@ const editPost = async (req, res) => {
 
     const imagePath = path.join(
       __dirname,
-      "./public/images/" + existingPost.img
+      "../public/images/" + existingPost.img
     );
 
     if (loggedInUserId == existingPost.authorId) {
@@ -264,7 +238,6 @@ const editPost = async (req, res) => {
             //ถ้ามีรูปใน images ค่อยลบ
             fs.unlinkSync(imagePath);
           }
-        } else {
           await db.Blog.update(
             { title, category, content, img: uploadedImage },
             { where: { id: postId } }
@@ -290,25 +263,12 @@ const editPost = async (req, res) => {
 // show search results
 const search = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
-    // แสดง category ทั้งหมดที่มี
-    const categories = await db.Category.findAll({});
-    // นับจำนวน category (จาก Blog ที่สร้าง)
-    const categoryCounts = await Promise.all(
-      categories.map(async (category) => {
-        const count = await db.Blog.count({
-          where: { categoryId: category.id },
-        });
-        return { name: category.name, count: count };
-      })
-    );
-    categoryCounts.sort((a, b) => b.count - a.count);
+    // แสดง category และนับจำนวนทั้งหมด (ใช้กับ sidebar)
+    const categories = await getCategories();
+    const categoryCounts = await getCategoryCounts(categories);
 
     const { search, category, author, page } = req.query;
 
@@ -322,8 +282,8 @@ const search = async (req, res) => {
       const { count, rows } = await db.Blog.findAndCountAll({
         where: {
           [Op.or]: [
-            { category: { [Op.iLike]: `%${search}%` } },
-            { author: { [Op.iLike]: `%${search}%` } },
+            { category: { [Op.iLike]: `${search}%` } },
+            { author: { [Op.iLike]: `${search}%` } },
             { title: { [Op.iLike]: `%${search}%` } },
           ],
         },
@@ -419,18 +379,14 @@ const search = async (req, res) => {
 // โชว์รายชื่อและโพสต์ของผู้เขียน
 const author = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     const { search } = req.query;
     let author = [];
     if (search) {
       author = await db.User.findAll({
-        attributes: ["id", "username", "profileImage"],
+        attributes: ["id", "username", "profileImage", "follower"],
         include: [
           {
             model: db.Blog,
@@ -445,7 +401,7 @@ const author = async (req, res) => {
       });
     } else {
       author = await db.User.findAll({
-        attributes: ["username", "id", "profileImage"],
+        attributes: ["username", "id", "profileImage", "follower"],
         include: [
           {
             model: db.Blog,
@@ -453,10 +409,7 @@ const author = async (req, res) => {
             attributes: ["title", "id"],
           },
         ],
-        order: [
-          ["username", "ASC"],
-          ["blogs", "title", "ASC"],
-        ], //ถ้าเรียงลำดับ ของ model ที่ include ต้องแยกอีก Array และใส่ชื่อ model นำหน้าด้วย//
+        order: [["username"], ["blogs", "title", "ASC"]], //ถ้าเรียงลำดับ ของ model ที่ include ต้องแยกอีก Array และใส่ชื่อ model นำหน้าด้วย//
         where: {
           "$blogs.id$": { [Op.ne]: null }, //ค้นหาเฉพาะผู้ที่ Blog ของตัวเอง
           //'$blogs.id$' = คือการเข้าถึงข้อมูลของ model ที่ถูก include เข้ามา (ต้องเป็น fk)
@@ -473,7 +426,7 @@ const author = async (req, res) => {
     });
 
     req.session.returnTo = req.originalUrl;
-    
+
     res.render("author", {
       authors: author,
       user,
@@ -490,17 +443,17 @@ const author = async (req, res) => {
 // อ่านตัวเต็มของโพสต์
 const readMore = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     const message = req.flash("success");
 
     const postId = req.params.id;
     const posts = await db.Blog.findByPk(postId);
+
+    // แสดง category และนับจำนวนทั้งหมด (ใช้กับ sidebar)
+    const categories = await getCategories();
+    const categoryCounts = await getCategoryCounts(categories);
 
     // เพิ่มยอดวิว
     await db.Blog.increment({ views: 1 }, { where: { id: postId } });
@@ -545,17 +498,6 @@ const readMore = async (req, res) => {
         },
       ],
     });
-
-    // แสดง category และนับจำนวนทั้งหมด (ใช้กับ sidebar)
-    const categories = await db.Category.findAll({});
-    const categoryCounts = await Promise.all(
-      categories.map(async (category) => {
-        const count = await db.Blog.count({
-          where: { categoryId: category.id },
-        });
-        return { name: category.name, count: count };
-      })
-    );
 
     // ใส่ [] กัน error จาก sidebar
     const topLikedBlogs = [];
@@ -749,12 +691,8 @@ const dislikePost = async (req, res) => {
 
 const about = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     res.render("about", { user, showUsername, googleUser, userNormal });
   } catch (error) {

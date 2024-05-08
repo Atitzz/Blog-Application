@@ -12,7 +12,7 @@ require("dotenv").config();
 const config = process.env;
 
 const { updateUserAndImage, updateUser } = require("./function/updateUser");
-
+const { getUserInfo, getUserNormal } = require("./function/getUser");
 
 // แบบฟอร์มสมัครสมาชิก
 const formRegister = (req, res) => {
@@ -28,10 +28,9 @@ const formRegister = (req, res) => {
 // สมัครสมาชิก (ตัวอย่างนี้ validate จาก controller)
 const register = async (req, res) => {
   try {
-    const { email, username, password, confirmPassword } = req.body;
+    const { email, username, password } = req.body;
     const existingUser = await db.User.findOne({
       where: { email: email },
-      indexHints: ["email_index"],
     });
 
     if (existingUser) {
@@ -70,7 +69,6 @@ const login = async (req, res) => {
     const { email, password, remember } = req.body;
     const user = await db.User.findOne({
       where: { email: email },
-      indexHints: ["email_index"],
     });
     if (!user) {
       req.flash("error", "ไม่มีชื่อนี้อยู่ในระบบ");
@@ -101,7 +99,7 @@ const login = async (req, res) => {
     }
 
     // ตรวจสอบ URL ที่เก็บไว้ใน session หากมีให้นำผู้ใช้ไปยัง URL นั้น หากไม่มีให้นำผู้ใช้ไปยังหน้าหลัก (index)
-    const returnTo = req.session.returnTo || '/';
+    const returnTo = req.session.returnTo || "/";
     delete req.session.returnTo;
     req.flash("success", user.username, "เข้าสู่ระบบเรียบร้อยแล้ว");
     res.redirect(returnTo);
@@ -128,12 +126,8 @@ const logout = (req, res) => {
 // ดูสมาชิก
 const members = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     const message = req.flash("error");
 
@@ -177,12 +171,9 @@ const members = async (req, res) => {
 // แบบฟอร์มจัดการสมาชิก
 const formManagement = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
+
     const successMessage = req.flash("success");
     const errorMessage = req.flash("error");
 
@@ -296,12 +287,8 @@ const deleteUser = async (req, res) => {
 // แบบฟอร์มแก้ไขข้อมูลส่วนตัว
 const editProfileForm = async (req, res) => {
   try {
-    const user = req.cookies && req.cookies.jwt;
-    const showUsername = req.cookies && req.cookies.user;
-    const googleUser = req.user || null;
-    const userNormal = showUsername
-      ? await db.User.findOne({ where: { username: showUsername } })
-      : null;
+    const { user, showUsername, googleUser } = getUserInfo(req);
+    const userNormal = await getUserNormal(showUsername);
 
     const authorId = req.params.id;
     const author = await db.User.findByPk(authorId);
@@ -399,8 +386,8 @@ const follow = async (req, res) => {
       await db.User.decrement({ follower: 1 }, { where: { id: authorId } });
     }
 
-    const returnTo = req.session.returnTo || '/'
-    delete req.session.returnTo
+    const returnTo = req.session.returnTo || "/";
+    delete req.session.returnTo;
     res.redirect(returnTo);
   } catch (error) {
     console.log(error);
@@ -417,9 +404,9 @@ const googleCallback = (req, res) => {
     failureFlash: true,
   })(req, res, () => {
     req.flash("success", req.user.username, "เข้าสู่ระบบเรียบร้อยแล้ว");
-    res.redirect('/')
+    res.redirect("/");
   });
-}
+};
 
 module.exports = {
   formRegister,
