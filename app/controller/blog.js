@@ -4,8 +4,13 @@ const { Op, Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
 
-const { getUserInfo, getUserNormal } = require("./function/getUser");
-const { getCategories, getCategoryCounts } = require("./function/getCategory");
+const {
+  getCategories,
+  getCategoryCounts,
+  getUserInfo,
+  getUserNormal,
+  getCommentCounts,
+} = require("../service/REUSE");
 
 // index (show post & set page)
 const index = async (req, res) => {
@@ -37,18 +42,7 @@ const index = async (req, res) => {
     const pageCount = Math.ceil(count / perPage);
 
     // นับจำนวน Comment และ Reply ของแต่ละ Blog
-    const commentCounts = await Promise.all(
-      blogs.map(async (blog) => {
-        const countComments = await db.Comment.count({
-          where: { postId: blog.id },
-        });
-        const countReplies = await db.Reply.count({
-          where: { postId: blog.id },
-        });
-        const totalCount = countComments + countReplies;
-        return { postId: blog.id, count: totalCount, showLike: blog.likes };
-      })
-    );
+    const commentCounts = await getCommentCounts(blogs);
 
     // แสดง Blog ล่าสุดบน Banner
     const latestBlog = await db.Blog.findAll({
@@ -62,6 +56,7 @@ const index = async (req, res) => {
       limit: 3,
     });
 
+    // แสดง Blog ที่มียอดเข้าชมมากที่สุด
     const topViewsBlogs = await db.Blog.findAll({
       order: [["views", "DESC"]],
       limit: 3,
@@ -287,7 +282,10 @@ const search = async (req, res) => {
             { title: { [Op.iLike]: `%${search}%` } },
           ],
         },
-        order: [["views", "DESC"]],
+        order: [
+          ["title", "ASC"],
+          ["views", "DESC"],
+        ],
         offset: (currentPage - 1) * perPage,
         limit: perPage,
         include: [
@@ -310,7 +308,10 @@ const search = async (req, res) => {
 
       const { count, rows } = await db.Blog.findAndCountAll({
         where: query,
-        order: [["views", "DESC"]],
+        order: [
+          ["title", "ASC"],
+          ["views", "DESC"],
+        ],
         offset: (currentPage - 1) * perPage,
         limit: perPage,
         include: [
@@ -326,7 +327,7 @@ const search = async (req, res) => {
       const { count, rows } = await db.Blog.findAndCountAll({
         offset: (currentPage - 1) * perPage,
         limit: perPage,
-        oder: [["views", "DESC"]],
+        oder: [["title", "ASC"]],
         include: [
           {
             model: db.User,
@@ -341,21 +342,11 @@ const search = async (req, res) => {
     const pageCount = Math.ceil(totalBlogs / perPage);
 
     // นับจำนวน Comment และ Reply ของแต่ละ Blog
-    const commentCounts = await Promise.all(
-      blogs.map(async (blog) => {
-        const countComments = await db.Comment.count({
-          where: { postId: blog.id },
-        });
-        const countReplies = await db.Reply.count({
-          where: { postId: blog.id },
-        });
-        const totalCount = countComments + countReplies;
-        return { postId: blog.id, count: totalCount, showLike: blog.likes };
-      })
-    );
+    const commentCounts = await getCommentCounts(blogs);
 
     // ใส่ [] กัน error จาก sidebar
     const topLikedBlogs = [];
+    const topViewsBlogs = [];
 
     res.render("search", {
       posts: blogs,
@@ -370,6 +361,7 @@ const search = async (req, res) => {
       userNormal,
       googleUser,
       topLikedBlogs,
+      topViewsBlogs,
     });
   } catch (error) {
     console.log(error);
@@ -411,7 +403,7 @@ const author = async (req, res) => {
         ],
         order: [["username"], ["blogs", "title", "ASC"]], //ถ้าเรียงลำดับ ของ model ที่ include ต้องแยกอีก Array และใส่ชื่อ model นำหน้าด้วย//
         where: {
-          "$blogs.id$": { [Op.ne]: null }, //ค้นหาเฉพาะผู้ที่ Blog ของตัวเอง
+          "$blogs.id$": { [Op.ne]: null }, //ค้นหาเฉพาะผู้ที่มี Blog ของตัวเอง
           //'$blogs.id$' = คือการเข้าถึงข้อมูลของ model ที่ถูก include เข้ามา (ต้องเป็น fk)
         },
       });
@@ -501,6 +493,7 @@ const readMore = async (req, res) => {
 
     // ใส่ [] กัน error จาก sidebar
     const topLikedBlogs = [];
+    const topViewsBlogs = [];
 
     // เก็บ Url ไว้ใน session เพื่อให้หลัง login เด้งกลับมาหน้าเดิม
     req.session.returnTo = req.originalUrl;
@@ -518,6 +511,7 @@ const readMore = async (req, res) => {
       googleUser,
       existingFollower,
       topLikedBlogs,
+      topViewsBlogs,
     });
   } catch (error) {
     console.log(error);

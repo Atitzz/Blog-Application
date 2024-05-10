@@ -11,8 +11,8 @@ require("../middleware/Oauth");
 require("dotenv").config();
 const config = process.env;
 
-const { updateUserAndImage, updateUser } = require("./function/updateUser");
-const { getUserInfo, getUserNormal } = require("./function/getUser");
+const { getUserInfo, getUserNormal } = require("../service/REUSE");
+const { updateUserAndImage, updateUser } = require("../service/USER");
 
 // แบบฟอร์มสมัครสมาชิก
 const formRegister = (req, res) => {

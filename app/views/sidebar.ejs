@@ -153,7 +153,7 @@
     
 
     <!-- Popular -->
-    <% if(topLikedBlogs.length > 0) { %>
+    <% if(topLikedBlogs.length > 0 ) { %>
       <div class="card my-4">
         <div class="card-header text-center" id="title-topLike">ยอดไลค์สูงสุด</div>
         <div class="card-body">
@@ -168,7 +168,9 @@
           <% }) %>
         </div>
       </div>
+    <% } %>
 
+    <% if(topViewsBlogs.length > 0 ) { %>
       <div class="card my-4">
         <div class="card-header text-center" id="title-topView">ยอดเข้าชมสูงสุด</div>
         <div class="card-body">

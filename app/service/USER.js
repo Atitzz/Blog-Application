@@ -1,4 +1,4 @@
-const db = require('../../models/index');
+const db = require('../models/index');
 
 const updateUserAndImage = async (userId, newUsername, newProfileImage) => {
     await db.User.update({ username: newUsername, profileImage: newProfileImage }, { where: { id: userId } });

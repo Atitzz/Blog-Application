@@ -8,7 +8,7 @@ const passport = require('passport');
 const connectDB = require("./config/connect");
 const router = require("./routes");
 const configViewEngine = require("./config/viewEngine");
-const descriptionText = require("./controller/function/localFunction");
+const { descriptionText } = require("./service/REUSE");
 
 const app = express();
 
