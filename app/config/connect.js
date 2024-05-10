@@ -6,7 +6,7 @@ const config = process.env;
 
 const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
     host: config.HOST,
-    dialect: config.DB_dialect,
+    dialect: "postgres",
     logging: console.log,
 
     pool: {
