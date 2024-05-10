@@ -2,15 +2,16 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const session = require("express-session");
-
 const passport = require('passport');
+const app = express();
 
 const connectDB = require("./config/connect");
 const router = require("./routes");
 const configViewEngine = require("./config/viewEngine");
 const { descriptionText } = require("./service/REUSE");
 
-const app = express();
+require("dotenv").config();
+const PORT = process.env.PORT || 3000;
 
 app.use(
   session({
@@ -36,4 +37,6 @@ configViewEngine(app);
 router(app);
 connectDB();
 
-module.exports = app;
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+})
