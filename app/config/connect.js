@@ -4,8 +4,8 @@ const db = require('../models/index');
 require("dotenv").config();
 const config = process.env;
 
-const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD, {
-    host: config.HOST,
+const sequelize = new Sequelize("sequelizeCRUD", "postgres", "postgres", {
+    host: "localhost",
     dialect: "postgres",
     logging: console.log,
 
