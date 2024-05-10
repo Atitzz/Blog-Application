@@ -1,0 +1,288 @@
+<style>
+  section {
+    background-color: #363b41;
+  }
+
+  .card-blog {
+    width: 100%;
+    border-radius: 15px !important;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+  }
+
+  .card-blog:hover {
+    transform: scale(1.05);
+  }
+
+  .card-img-top {
+    border-top-left-radius: 15px;
+    width: 100% !important;
+    height: 400px !important;
+  }
+
+  .card-title {
+    color: #3c3b3b;
+  }
+
+  .card-body {
+    margin-bottom: 0;
+  }
+
+  .custom-btn {
+    margin-top: 10px;
+  }
+
+  .custom-btn {
+    background-color: #fed41a !important;
+    color: #3c3b3b !important;
+    border: none !important;
+    border-radius: 5px !important;
+    transition: background-color 0.3s ease;
+    width: 100%;
+  }
+
+  .custom-btn:hover {
+    background-color: #ff8c00 !important;
+    transform: scale(1.1);
+    font-weight: bold;
+  }
+
+  .card-comment {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    text-align: right;
+  }
+
+  .comment-count {
+    font-size: 14px;
+    color: #888;
+    text-align: right;
+    margin-top: 10px;
+    display: inline-block;
+    margin-left: 5px;
+  }
+
+  .like-count {
+    font-size: 14px;
+    color: #888;
+    text-align: right;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  .view-count {
+    font-size: 14px;
+    color: #888;
+    margin: 0px 0px 0px 0px;
+  }
+
+  .author-image {
+    width: 40px;
+    height: 40px;
+    border: solid 2px #ffc400;
+    border-radius: 50%;
+  }
+
+  .pagination .page-item .page-link {
+    color: #ff8c00 !important;
+    font-weight: bold;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #fed41a !important;
+    border-color: #fed41a !important;
+    color: #fff !important;
+  }
+
+  #carousel-1 {
+    font-weight: bold;
+    margin-bottom: 320px;
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
+  #carousel-2 {
+    color: #fff;
+    font-size: 18px;
+  }
+
+  .carousel-item:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+  }
+</style>
+
+<section id="navbar">
+<%- include('navbar') %>
+</section>
+
+<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+  <ol class="carousel-indicators">
+    <% latestBlog.forEach((blog, index)=> { %>
+      <li data-target="#carouselExampleIndicators" data-slide-to="<%= index %>"
+        class="<%= index === 0 ? 'active' : '' %>">
+      </li>
+      <% }) %>
+  </ol>
+  <div class="carousel-inner">
+    <% latestBlog.forEach((blog, index)=> { %>
+      <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+        <a href="/show/<%= blog.id%>">
+          <img src="/images/<%= blog.img %>" class="d-block w-100" style="width: 100%; height: 400px" />
+          <h5 class="carousel-caption" id="carousel-1">บทความล่าสุด # <%= blog.author %>
+          </h5>
+          <div class="carousel-caption" id="carousel-2">
+            <h5>
+              <%= blog.title %>
+            </h5>
+            <p><%- descriptionText(blog.content, 100) %></p>
+          </div>
+        </a>
+      </div>
+      <% }) %>
+  </div>
+  <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <% if (message.length> 0) { %>
+        <div class="mt-3 alert alert-success" id="custom-message">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <strong>
+            <%= message %>
+          </strong>
+        </div>
+        <% } %>
+          <% if (posts.length> 0) { %>
+            <h3 class="my-3 text-center">บทความทั้งหมด</h3>
+            <hr style="border: 1px solid #fed41a; margin-bottom: 30px" />
+
+            <% posts.forEach((blog)=> { %>
+
+              <div class="card card-blog">
+                <div class="row">
+                  <div class="col-md-6">
+                    <img class="card-img-top" src="/images/<%= blog.img %>" alt="Card image cap" />
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card-body">
+                      <h2 class="card-title">
+                        <%= blog.title %>
+                      </h2>
+                      <div>
+                      <p class="card-text"><%- descriptionText(blog.content, 200) %></p>
+                      </div>
+
+                      <!-- แสดง view & like & comment -->
+                      <div class="card-comment">
+
+                        <!-- แสดงยอด view -->
+                        <% if(blog.views> 0) { %>
+                          <p class="view-count">
+                            <%= blog.views %> views
+                          </p>
+                          <% } %>
+
+                            <!-- แสดงจำนวน like & comment -->
+                            <% const commentCount=commentCounts.find(comment=>comment.postId === blog.id) %>
+                              <% if (commentCount && commentCount.showLike> 0) { %>
+                                <span class="like-count">
+                                  <%= commentCount.showLike %> Like
+                                </span>
+                                <% } %>
+                                  <% if (commentCount && commentCount.count> 0) { %>
+                                    <span class="comment-count">
+                                      <%= commentCount.count %> Comment
+                                    </span>
+                                    <% } %>
+                      </div>
+                      <a href="/show/<%= blog.id %>" class="btn btn-primary custom-btn">Read More &rarr;</a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card-footer text-muted">
+                  <% if(blog.blogs.profileImage.startsWith('http')) { %>
+                    <img src="<%= blog.blogs.profileImage %>" class="author-image" style="margin-right: 5px" />
+                    <% } else { %>
+                      <img src="/profile/<%= blog.blogs.profileImage %>" class="author-image"
+                        style="margin-right: 5px" />
+                      <% } %>
+                        <a href="/posts/show/?author=<%= blog.author %>">
+                          <%= blog.author %>
+                        </a>
+                        <span class="posted-info">Posted on <%= day(blog.createdAt).format('DD-MM-YYYY HH:mm') %></span>
+                        หมวดหมู่
+                        <a href="/posts/show/?category=<%= blog.category %>">
+                          <%= blog.category %>
+                        </a>
+                </div>
+              </div>
+
+              <% }) %>
+                <% } else { %>
+                  <h1 class="m-3">"ไม่พบบทความ"</h1>
+                  <% } %>
+    </div>
+    <%- include('sidebar') %>
+  </div>
+</div>
+
+<% if (posts.length> 0) { %>
+  <nav aria-label="Dashboard Pagination">
+    <ul class="pagination justify-content-center mt-5">
+      <% if (currentPage==1) { %>
+        <li class="page-item disabled"><a href="#" class="page-link">First</a></li>
+        <% } else { %>
+          <li class="page-item"><a href="/?page=1" class="page-link">First</a></li>
+          <% } %>
+
+            <% var i=(Number(currentPage)> 3 ? Number(currentPage) - 2 : 1) %>
+              <% if (i !==1) { %>
+                <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
+                <% } %>
+
+                  <% for (; i <=(Number(currentPage) + 2) && i <=pageCount; i++) { %>
+                    <% if (i==currentPage) { %>
+                      <li class="page-item active disabled">
+                        <a href="#" class="page-link">
+                          <%= i %>
+                        </a>
+                      </li>
+                      <% } else { %>
+                        <li class="page-item">
+                          <a href="/?page=<%= i %>" class="page-link">
+                            <%= i %>
+                          </a>
+                        </li>
+                        <% } %>
+                          <% } %>
+
+                            <% if (Number(currentPage) + 2 < pageCount) { %>
+                              <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
+                              <% } %>
+
+                                <% if (currentPage==pageCount) { %>
+                                  <li class="page-item disabled"><a href="#" class="page-link">Last</a></li>
+                                  <% } else { %>
+                                    <li class="page-item">
+                                      <a href="/?page=<%= pageCount %>" class="page-link">Last</a>
+                                    </li>
+                                    <% } %>
+    </ul>
+  </nav>
+  <% } %>
+
+    <%- include('footer') %>

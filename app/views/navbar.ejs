@@ -1,0 +1,150 @@
+<style>
+
+  .navbar-nav .nav-link {
+    transition: color 0.3s;
+  }
+
+  .navbar-nav .nav-item:hover {
+    box-shadow: 0 0 20px rgb(255, 213, 0) ; 
+    background: rgba(255, 255, 255, 0.1) ;
+  }
+
+  .navbar-nav .nav-item:hover .nav-link {
+    color: #fff !important;
+  }
+
+  .navbar-nav .nav-item {
+    margin-left: 15px;
+  }
+
+  .navbar-nav .nav-item:hover {
+    border: 1px solid #ffc400;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 10px 20px;
+  }
+
+  .author-image {
+    width: 40px;
+    height: 40px;
+    border: solid 2px #ffc400;
+    border-radius: 50%;
+  }
+  
+  .dropdown-menu {
+    background-color: #343a40 !important;
+  }
+
+  .dropdown-item {
+    color: #fff !important;
+  }
+
+  .dropdown-menu:hover, .dropdown-item:hover {
+    background-color: #ffc400 !important;
+  }
+
+  #custom-btn {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); 
+    background: rgba(255, 255, 255, 0.1); 
+    border: 1px solid rgba(255, 213, 0); 
+  }
+  #custom-btn:hover {
+    box-shadow: 0 0 20px rgb(255, 213, 0) ; 
+    background: rgba(255, 255, 255, 0.1) ;
+    color: #fff;
+  }
+
+</style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+  crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+<nav class="navbar navbar-expand-lg navbar-dark" id="nav-container">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="fas fa-blog text-warning"></i> Blog Application
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/post/add">
+            <i class="fas fa-pencil-alt mr-1"></i> เขียนบทความ
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/category/add">
+            <i class="fas fa-folder-plus mr-1"></i> ประเภทบทความ
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/author">
+            <i class="fas fa-user-edit mr-1"></i> ผู้เขียน
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/users/members">
+            <i class="fas fa-users-cog mr-1"></i> สมาชิก
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">
+            <i class="fas fa-address-card mr-1 "></i> เกี่ยวกับฉัน
+          </a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ml-auto">
+        <% if(user) { %>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <img src="/profile/<%= userNormal.profileImage %>" class="author-image">
+              <%= showUsername %>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/users/logout">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+              </a>
+            </div>
+          </li>
+        <% } else if (googleUser) { %>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img src="<%= googleUser.profileImage %>" class="author-image">
+              <%= googleUser.username %>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/users/logout">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+              </a>
+            </div>
+          </li>
+        <% } else { %>
+          <li class="m-1">
+            <a class="nav-link btn" id="custom-btn" href="/users/register">
+              <i class="fas fa-user-plus mr-1"></i> Sign Up
+            </a>
+          </li>
+          <li class="m-1">
+            <a class="nav-link btn" id="custom-btn" href="/users/login">
+              <i class="fas fa-sign-in-alt mr-1"></i> Login
+            </a>
+          </li>
+        <% } %>
+      </ul>
+
+    </div>
+  </div>
+</nav>

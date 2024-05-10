@@ -1,0 +1,100 @@
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background-image: url('https://cdn.pixabay.com/photo/2017/10/10/16/55/halloween-2837936_640.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Your-Preferred-Font', sans-serif;
+  }
+
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+    text-align: center;
+  }
+
+  .card {
+    width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); 
+    background: rgba(255, 255, 255, 0.1); /* ทำให้ card โปร่งใส */
+    border: 1px solid rgba(255, 255, 255, 0.3); 
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .card-title {
+    color: #333;
+  }
+
+  .alert {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    border-radius: 5px;
+  }
+
+  #countdown {
+    font-size: 1rem;
+  }
+
+  .btn-login {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #6e6c61;
+    border: 1px solid #6e6c61;
+    border-radius: 5px;
+    text-decoration: none;
+  }
+
+  .btn-login:hover {
+    color: #fff;
+    background-color: #fed41a;
+    border-color: #fed41a;
+    text-decoration: none;
+  }
+</style>
+
+<div class="container mt-0">
+  <div class="card text-center">
+    <div class="card-body">
+      <h2 class="card-title mb-5" style="color: white">สมัครสมาชิกเรียบร้อยแล้ว</h2>
+
+      <div class="" style="color: white">
+        <strong>ขอบคุณที่สมัครสมาชิก!</strong><br> คุณสามารถเข้าสู่ระบบได้ทันที.
+      <div id="countdown" class="mt-3">10</div>
+      </div>
+
+      <p class="card-text mt-3">
+        <a href="/users/login" class="btn-login">เข้าสู่ระบบ</a>
+      </p>
+
+    </div>
+  </div>
+
+  <script>
+    let countdown = 10;
+
+    function updateCountdown() {
+      document.getElementById('countdown').innerText = countdown;
+      countdown--;
+
+      if (countdown < 0) {
+        clearInterval(countdownInterval);
+        window.location.href = '/users/login'; // เด้งไปหน้า login
+      }
+    }
+
+    const countdownInterval = setInterval(updateCountdown, 1000);
+  </script>
+</div>

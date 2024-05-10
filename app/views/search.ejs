@@ -1,0 +1,245 @@
+<style>
+
+  section {
+    background-color: #363b41;
+  }
+  .card-body {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-blog {
+    width: 100%;
+    border-radius: 15px !important;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+  }
+
+  .card-blog:hover {
+    transform: scale(1.05);
+  }
+
+  .card-img-top {
+    border-top-left-radius: 15px;
+    width: 100%;
+    height: 400px;
+  }
+
+  .card-title {
+    color: #3c3b3b;
+  }
+
+  .card-comment {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    text-align: right;
+  }
+
+  .comment-count {
+    font-size: 14px;
+    color: #888;
+    text-align: right;
+    margin-top: 10px;
+    display: inline-block;
+    margin-left: 5px;
+  }
+
+  .like-count {
+    font-size: 14px;
+    color: #888;
+    text-align: right;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  .view-count {
+    font-size: 14px;
+    color: #888;
+    margin: 0px 0px 0px 0px;
+  }
+
+  .custom-btn {
+    margin-top: 10px;
+    background-color: #fed41a !important;
+    color: #3c3b3b !important;
+    border: none !important;
+    border-radius: 5px !important;
+    transition: background-color 0.3s ease;
+  }
+  .custom-btn:hover {
+    background-color: #ff8c00 !important;
+    transform: scale(1.1);
+  }
+
+  .author-image {
+    width: 40px;
+    height: 40px;
+    border: solid 2px #ff8c00;
+    border-radius: 50%;
+  }
+
+  .btn-goBack {
+    border: none;
+    background-color: #fff;
+    color: #888;
+    font-size: 16px;
+    margin: 5px 0px 0px 0px;
+  }
+
+  .btn-goBack:hover {
+    color: #ff8c00;
+    cursor: pointer;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+  }
+
+  .pagination .page-item .page-link {
+    color: #ff8c00 !important;
+    font-weight: bold !important;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #fed41a !important;
+    border-color: #fed41a !important;
+    color: #fff !important;
+  }
+</style>
+
+<section id="navbar">
+  <%- include('navbar') %>
+</section>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <button onclick="goBack()" class="btn-goBack">
+        <i class="fa-solid fa-circle-chevron-left"> ย้อนกลับ</i>
+      </button>
+
+      <!-- ปุ่มย้อนกลับ -->
+      <div class="text-center">
+        <span style="font-size: 30px;">ค้นหา "<%= search %>"</span>
+        <hr style="border: 1px solid #fed41a; margin-bottom: 30px; margin-top: 0px;" />
+      </div>
+
+      <% if (posts.length> 0) { %>
+        <% posts.forEach((post)=> { %>
+          <div class="card card-blog">
+            <div class="row">
+              <div class="col-md-6">
+                <img class="card-img-top" src="/images/<%= post.img %>" alt="Card image cap" />
+              </div>
+              <div class="col-md-6">
+                <div class="card-body"> 
+                  <h2 class="card-title">
+                    <%= post.title %>
+                  </h2>
+                  <div>
+                  <p class="card-text"><%- descriptionText(post.content, 200) %></p>
+                  </div>
+
+                  <!-- แสดง view & like & comment -->
+                  <div class="card-comment">
+
+                    <!-- แสดงยอด view -->
+                    <% if(post.views> 0) { %>
+                      <p class="view-count">
+                        <%= post.views %> views
+                      </p>
+                      <% } %>
+
+                        <!-- แสดงจำนวน like & comment -->
+                        <% const commentCount=commentCounts.find(comment=> comment.postId === post.id) %>
+                          <% if (commentCount && commentCount.showLike> 0) { %>
+                            <span class="like-count">
+                              <%= commentCount.showLike %> Like
+                            </span>
+                            <% } %>
+                              <% if (commentCount && commentCount.count> 0) { %>
+                                <span class="comment-count">
+                                  <%= commentCount.count %> Comment
+                                </span>
+                                <% } %>
+                  </div>
+                  <a href="/show/<%= post.id %>" class="btn btn-primary custom-btn">Read More &rarr;</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer text-muted">
+              <% if(post.blogs.profileImage.startsWith('http')) { %>
+                <img src="<%= post.blogs.profileImage %>" class="author-image" style="margin-right: 5px;" />
+                <% } else { %>
+                  <img src="/profile/<%= post.blogs.profileImage %>" class="author-image" style="margin-right: 5px;" />
+                  <% } %>
+                    <a href="/posts/show/?author=<%= post.author %>">
+                      <%= post.author %>
+                    </a>
+                    <span class="posted-info">Posted on <%= day(post.createdAt).format('DD-MM-YYYY HH:mm') %></span>
+                    หมวดหมู่
+                    <a href="/posts/show/?category=<%= post.category %>">
+                      <%= post.category %>
+                    </a>
+            </div>
+          </div>
+          <% }) %>
+
+            <% } else { %>
+              <h3 class="my-4">ไม่พบบทความ</h3>
+              <% } %>
+    </div>
+    <%- include('sidebar') %>
+  </div>
+</div>
+
+
+
+<div class="pagination">
+  <% if (pageCount> 1 && currentPage <= pageCount) { %>
+      <% if (currentPage==1) { %>
+        <li class="page-item disabled"><a class="page-link" href="#">First</a></li>
+        <% } else { %>
+          <li class="page-item"><a class="page-link" href="?page=1&search=<%= search %>">First</a></li>
+          <% } %>
+
+            <% var i=(Number(currentPage)> 5 ? Number(currentPage) - 4 : 1) %>
+              <% if (i !==1) { %>
+                <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                <% } %>
+
+                  <% for (; i <=pageCount && i <=(Number(currentPage) + 4); i++) { %>
+                    <% if (i===1 || i===pageCount || (i>= currentPage - 2 && i <= currentPage + 2)) { %>
+                        <li class="page-item <%= currentPage === i ? 'active disabled' : '' %>">
+                          <a class="page-link" href="?page=<%= i %>&search=<%= search %>">
+                            <%= i %>
+                          </a>
+                        </li>
+                        <% } %>
+                          <% } %>
+
+                            <% if (currentPage < pageCount) { %>
+                              <li class="page-item"><a class="page-link"
+                                  href="?page=<%= pageCount %>&search=<%= search %>">Last</a></li>
+                              <% } else { %>
+                                <li class="page-item disabled"><a class="page-link" href="#">Last</a></li>
+                                <% } %>
+                                  <% } %>
+</div>
+</div>
+
+<%- include('footer') %>
+
+  <script>
+    function goBack() {
+      window.history.back();
+    }
+  </script>
