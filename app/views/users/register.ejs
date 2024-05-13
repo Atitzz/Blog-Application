@@ -72,14 +72,22 @@
     color: #ffffff79;
   }
 
-  #password-toggle,
-  #password-toggle2 {
-    cursor: pointer;
-    color: #333;
+  #password, #password2 {
+    z-index: 0;
+  }
+
+  #password-toggle, #password-toggle2 {
+    position: absolute;
+    top: 50%;
+    right: 0px;
     font-size: 20px;
+    transform: translateY(-50%);
     background-color: transparent;
     border: none;
+    cursor: pointer;
+    z-index: 1;
   }
+
 
   #password-toggle:hover, #password-toggle:focus i,
   #password-toggle2:hover, #password-toggle2:focus i {
@@ -415,7 +423,7 @@
     function validateForm() {
       if (!validateEmail() || !validateUsername() || !validatePassword() || !validateConfirmpassword()) {
         submitError.style.display = 'block';
-        submitError.innerHTML = 'กรุณากรอกข้อมูลให้ครบถ้วน'
+        // submitError.innerHTML = 'กรุณากรอกข้อมูลให้ครบถ้วน'
         setTimeout(function() {
           submitError.style.display = 'none';
         }, 4000)

@@ -34,21 +34,6 @@
     position: relative;
   }
 
-  .input-addon1,
-  .input-addon2 {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    z-index: 1;
-  }
-
-  .input-addon i {
-    font-size: 18px;
-    color: #333;
-    transition: color 0.3s ease;
-  }
-
   #email,
   #password {
     padding: 6px 0px 6px 20px;
@@ -58,6 +43,20 @@
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #fff
+  }
+  #password {
+    z-index: 0;
+  }
+
+  #password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0px;
+    transform: translateY(-50%);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
   }
 
   #email:focus, #username:focus, #password:focus, #password2:focus {
@@ -80,12 +79,6 @@
     color: #ffffff79 !important;
   }
 
-  #password-toggle {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-  }
-
   .input-group-text i {
     font-size: 20px;
     color: #333;
@@ -97,6 +90,19 @@
     color: #f1c40f;
   }
 
+  .input-addon1 {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  .input-addon i {
+    font-size: 18px;
+    color: #333;
+    transition: color 0.3s ease;
+  }
 
   #remember {
     margin: 20px 0px -10px 10px;
@@ -200,7 +206,7 @@
           <div class="form-group">
             <div class="input-group">
               <input type="email" id="email" class="form-control" placeholder="Email" name="email"
-                onkeyup="validateEmail()">
+                onkeyup="validateEmail()" required>
               <div class="input-addon1" id="input-addon1"></div>
             </div>
             <div id="email-error"></div>
@@ -229,7 +235,7 @@
               เข้าสู่ระบบ
             </button>
           </div>
-          <!-- <div id="submit-error"></div> -->
+        <div id="submit-error"></div>
 
           <p id="link-register">ยังไม่มีบัญชี ? <a href="/users/register" style="color: #fff"><u>สมัครสมาชิก</u></a></p>
           <hr>
@@ -316,6 +322,7 @@
         passwordInput.type = "password";
         passwordToggle.innerHTML = '<i class="fa fa-eye" onclick="togglePassword()"></i>';
       }
+      
     }
   </script>
 
@@ -364,7 +371,7 @@
     function validateForm() {
       if (!validateEmail() || !validatePassword()) {
         submitError.style.display = 'block';
-        submitError.innerHTML = 'กรุณากรอกข้อมูลให้ครบถ้วน'
+        // submitError.innerHTML = 'กรุณากรอกข้อมูลให้ครบถ้วน'
         setTimeout(function () {
           submitError.style.display = 'none';
         }, 4000)
