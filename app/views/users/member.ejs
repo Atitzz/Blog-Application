@@ -1,0 +1,131 @@
+<style>
+    
+    section {
+        background-color: #363b41;
+    }
+  
+    .btn-goBack {
+        border: none;
+        background-color: #fff;
+        color: #888;
+        font-size: 16px;
+        margin: -19px 0px -30px 0px;
+    }
+
+    .btn-goBack:hover {
+        color: #ff8c00;
+        cursor: pointer;
+    }
+
+    #custom-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+    #custom-img:hover {
+        transform: scale(1.5);
+    }
+
+    #hover-tr:hover {
+        background: #ff8c00;
+        color: #fff
+    }
+
+</style>
+
+<section>
+    <%- include('../navbar') %>
+</section>
+
+<div class="container mt-4">
+        <!-- ปุ่มย้อนกลับ -->
+        <button onclick="goBack()" class="btn-goBack">
+            <i class="fa-solid fa-circle-chevron-left"> ย้อนกลับ</i>
+        </button>
+
+        <div class="row justify-content-end">
+            <h2 class="text-center" style="margin-right: 25%;">MEMBERS
+                <hr style="border-bottom: 2px solid #fed41a; margin: 2px auto; width: 100%;" />
+            </h2>
+            <form class="custom-form form-group" action="/users/members/" method="get">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="ค้นหาสมาชิก ..." name="search">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-secondary margin-right-10">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <% if((userNormal && userNormal.role == 'admin') || (googleUser && googleUser.role == 'admin')) { %>
+        <div class="text-right">
+            <a href="/users/management" class="btn btn-outline-secondary"><i class="fa-solid fa-gear"></i> จัดการสมาชิก</a>
+        </div>
+        <% } %>
+
+        <% if(message.length> 0) { %>
+            <% message.forEach((msg)=> { %>
+                <div class="alert alert-danger text-center" role="alert" id="custom-alert">
+                    <%= msg %>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <% const showMember = members.filter(member => member.id !== null) %>
+        <% if(showMember.length > 0) { %>
+        <div class="table-responsive mt-4">
+            <table class="table table-hover" style="border: 2px solid #000">
+                <thead class="thead-dark">
+                    <tr>
+                        <th class="text-center">No.</th>
+                        <th class="text-center">Profile</th>
+                        <th class="text-center">Username</th>
+                        <th class="text-center">Role</th>
+                        <th class="text-center">เป็นสมาชิกเมื่อ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% members.forEach((member, index) => { %>
+                        <tr id="hover-tr">
+                            <td class="text-center align-middle"><%= index + 1 %></td>
+                            <% if(member.profileImage.startsWith("http")) { %>
+                            <td class="text-center align-middle"><img src="<%= member.profileImage %>" alt="Profile Image" id="custom-img"></td>
+                            <% } else { %>
+                            <td class="text-center align-middle"><img src="/profile/<%= member.profileImage %>" alt="Profile Image" id="custom-img"></td>
+                            <% } %>
+                            <td class="text-center align-middle"><%= member.username %></td>
+                            <td class="text-center align-middle"><%= member.role %></td>
+                            <td class="text-center align-middle"><%= day(member.createdAt).format("DD/MM/YYYY") %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        <% } %>
+        
+        <% if (showMember.length === 0 ) { %>
+            <div class="alert alert-warning text-center" style="margin-top: 20px;" role="alert">
+                ไม่พบชื่อสมาชิก
+                <br>
+            </div>
+            <div class="text-center">
+                <a href="/users/members">ย้อนกลับ</a>
+            </div>
+            <script>
+                setTimeout(function () {
+                    window.location.href = "/users/members";
+                }, 4000); 
+            </script>
+        <% } %>
+
+</div>
+
+<%- include('../footer') %>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>

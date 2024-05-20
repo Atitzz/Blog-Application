@@ -1,0 +1,151 @@
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+
+<style>
+
+    section {
+        background-color: #363b41;
+    }
+
+    .container-1 {
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-top: 50px;
+        margin-bottom: 30px;
+        max-width: 600px;
+        background-color: #fff;
+        padding: 10px 20px 15px 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    h2 {
+        color: #495057;
+        text-align: center;
+        border-bottom: 2px solid #fed41a; 
+        padding-bottom: 10px; 
+        width: calc(100% - 0px);
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+    }
+
+    label {
+        font-weight: bold;
+        color: #495057;
+    }
+
+    .form-control {
+        border-radius: 10px;
+    }
+
+    textarea {
+        resize: vertical;
+        border-radius: 10px;
+    }
+
+    .btn-primary {
+        background-color: #fed41a !important;
+        color: #3c3b3b !important;
+        font-weight: bold !important;
+        border: none !important;
+        border-radius: 10px !important;
+        width: 70%;
+        height: 50px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+
+    }
+
+    .btn-primary:hover {
+        background-color: #ff8c00 !important;
+        transform: scale(1.1);
+        font-weight: bold;
+    }
+</style>
+
+<section id="navbar">
+    <%- include('navbar') %>
+</section>
+
+    <div class="my-3">
+        <% if(message.length > 0) { %>
+            <div class="alert alert-danger text-center" id="custom-alert">
+                <%= message %>
+            </div>
+        <% } %> 
+    </div>  
+
+    <% blog.forEach((data) => { %>
+    <div class="container-1">
+        <h2 class="my-4" align="center">เขียนบทความ</h2>
+        <form class="needs-validation" novalidate action="/edit/<%= data.id %>" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="">หัวข้อ</label>
+                <input type="text" name="title" value="<%= data.title %>" class="form-control" required>
+                <div class="invalid-feedback">กรุณากรอกหัวข้อ</div>
+            </div>
+            <% if(categories) { %>
+            <div class="form-group">
+                <label for="">หมวดหมู่</label>
+                <select class="form-control" name="category" id="" required>
+                        <option value="<%= data.category %>"><%= data.category %></option>
+                    <% categories.forEach(function(category) { %>
+                        <option value="<%= category.name %>"><%= category.name %></option>
+                    <% }) %>
+                </select>
+                <div class="invalid-feedback">กรุณาเลือกหมวดหมู่</div>
+            </div>
+            <% } %>
+            <div class="form-group">
+                <label for="">เนื้อหา</label>
+                <textarea name="content" id="content" cols="80" rows="8"><%= data.content %></textarea>
+            </div>
+            <div class="form-group">
+                <label for="">ภาพปก</label>
+                <input type="file" name="img" value="" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="">ผู้เขียน</label>
+                <input type="text" name="author" value="<%= data.author %>" class="form-control" readonly>
+            </div>
+            
+            <input class="btn btn-primary" type="submit" name="" value="บันทึกข้อมูล">
+        </form>
+    </div>
+    <% }) %>
+
+
+<script type="text/javascript">
+    CKEDITOR.replace( 'content' );
+</script>
+
+<script>
+    (function() {
+      'use strict';
+      window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+          form.addEventListener('submit', function(event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+        });
+      }, false);
+    })();
+</script>
+
+<script>
+    setTimeout(() => {
+        document.getElementById('custom-alert').style.display = 'none';
+    }, 4000);
+</script>
+

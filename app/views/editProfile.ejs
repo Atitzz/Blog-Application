@@ -1,0 +1,115 @@
+<style>
+
+    section {
+        background-color: #363b41;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .card {
+        box-shadow: 0px 5px 8px rgb(255, 217, 0);
+    }
+
+    .card-img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="file"] {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        box-sizing: border-box;
+    }
+
+    #customBTN {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+
+    #customBTN:hover {
+        background-color: #0056b3;
+        transform: scale(1.1);
+    }
+</style>
+
+<section id="navbar">
+    <%- include('navbar') %>
+</section>
+
+<div class="container">
+    <h2 class="my-4" align="center">Edit Profile
+     <hr style="border-bottom: 2px solid #fed41a; margin: 2px auto; width: 20%;" />
+    </h2>
+    <% if(messageSuccess.length > 0) { %>
+        <% messageSuccess.forEach((msg) => { %>
+            <div class="alert alert-success text-center" role="alert" id="custom-alert">
+                <%= msg %>
+            </div>
+        <% }) %>
+    <% } else if (messageError.length > 0) { %>
+        <% messageError.forEach((msg) => { %>
+            <div class="alert alert-danger text-center" role="alert" id="custom-alert">
+                <%= msg %>
+            </div>
+        <% }) %>
+    <% } %>    
+
+    <div class="card">
+        <div class="row no-gutters">
+            <div class="col-md-4">
+                <% if (author && author.profileImage) { %>
+                    <% if (author.profileImage.startsWith("http")) { %>
+                        <img src="<%= author.profileImage %>" class="card-img" alt="Profile Image">
+                    <% } else { %>
+                        <img src="/profile/<%= author.profileImage %>" class="card-img" alt="Profile Image">
+                    <% } %>
+                <% } %>
+                
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <form action="/users/edit-profile/<%= author.id %> %>" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" value="<%= author.username %>" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="img">ภาพโปรไฟล์</label>
+                            <input type="file" id="img" name="img" value="" class="form-control">
+                        </div>
+                        
+                        <input id="customBTN" class="btn btn-primary" type="submit" value="บันทึกข้อมูล">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        document.getElementById('custom-alert').style.display = 'none';
+    }, 4000);
+</script>
