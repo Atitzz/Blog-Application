@@ -12,6 +12,7 @@ require("dotenv").config();
 const config = process.env;
 
 const {
+  createUser,
   getUserInfo,
   getUserNormal,
   updateUserAndImage,
@@ -42,12 +43,7 @@ const register = async (req, res) => {
       return res.redirect("/users/register");
     } else {
       const hash = await bcrypt.hash(password, 10);
-      const newUser = await db.User.create({
-        email,
-        username,
-        password: hash,
-        profileImage: "user.jpg",
-      });
+      await createUser(email, username, hash);
 
       res.redirect("/users/registerSuccess");
     }

@@ -1,5 +1,14 @@
 const db = require("../models/index");
 
+const createUser = async (email, username, password, profileImage) => {
+  await db.User.create({
+    email,
+    username,
+    password,
+    profileImage: "user.jpg",
+  });
+};
+
 const getUserInfo = (req) => {
   const user = req.cookies && req.cookies.jwt;
   const showUsername = req.cookies && req.cookies.user;
@@ -48,4 +57,4 @@ const updateUser = async (userId, newUsername) => {
   );
 };
 
-module.exports = { getUserInfo, getUserNormal, updateUserAndImage, updateUser };
+module.exports = { createUser, getUserInfo, getUserNormal, updateUserAndImage, updateUser };
