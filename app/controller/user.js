@@ -342,6 +342,7 @@ const editProfile = async (req, res) => {
       } else {
         await updateUser(authorId, username);
       }
+      res.cookie('user', username);
       req.flash("success", "Successfully updated");
       res.redirect(`/users/edit-profile/${authorId}`);
     } else {
